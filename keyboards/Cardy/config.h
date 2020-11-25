@@ -41,3 +41,6 @@
 /* Locking resynchronize hack */
 #define LOCKING_RESYNC_ENABLE
 
+//OLED
+#define OLED_FONT_WIDTH 6
+#define OLED_FONT_HEIGHT 11

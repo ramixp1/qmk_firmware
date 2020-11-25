@@ -10,6 +10,13 @@ enum custom_keycodes {
   C_S_T = SAFE_RANGE
 };
 
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+  
+    return OLED_ROTATION_180;  // flip 180 for offhand
+  return rotation;
+}
+
+
 
 
 // Tap Dance Declarations
@@ -17,7 +24,7 @@ enum tap_dance { TD_TO_L1 = 0, TD_TO_L0 = 1 };
 
 qk_tap_dance_action_t tap_dance_actions[] = {
     // Tap once for standard key, twice to toggle to control layer
-    [TD_TO_L1]     = ACTION_TAP_DANCE_DUAL_ROLE(KC_MUTE, _Ll),
+    [TD_TO_L1]     = ACTION_TAP_DANCE_DUAL_ROLE(KC_MPLY, _Ll),
     [TD_TO_L0] = ACTION_TAP_DANCE_DUAL_ROLE(KC_5, _BASE),
 	
 	};
@@ -36,8 +43,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_BASE] =LAYOUT
 
 (
-	TD(TD_TO_L1), KC_4,
-	KC_2, KC_3
+	TD(TD_TO_L1), C_S_T,
+	KC_F20, KC_F21
 ),
 
 
@@ -84,6 +91,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 
+
+
+
 //	screen:
 
 
@@ -109,7 +119,7 @@ static void render_logo(void) {
 */ 
 
 //RD Logo x3
-
+/*
 static void render_logo(void) {
   static const char PROGMEM my_logo[] = {
 0x1f, 0x0f, 0xc7, 0xe3, 0xe1, 0x01, 0xf8, 0xfc, 0xfc, 0x3e, 0x1e, 0x9e, 0x9e, 0x9e, 0x9e, 0x1e,
@@ -176,8 +186,10 @@ static void render_logo(void) {
 
 
 
-
+*/
 // trigger screen
+
+// OLED Rotation enum values are flags
 
 #ifdef OLED_DRIVER_ENABLE
 void oled_task_user(void) {
@@ -185,16 +197,52 @@ void oled_task_user(void) {
 
     switch (get_highest_layer(layer_state)) {
         case _BASE:
-           render_logo(); 
+               oled_write_P(PSTR("Default\nPlay     |    C+S+T\nMute ZM  |  ZM F_SC\n"), false); 
+            break;
+	case _Ll:
+            oled_write_P(PSTR("Layer 1\n"), false);
             break;
 
 
+    }
+	
+	
+	
+	
+    // Host Keyboard LED Status
+    led_t led_state = host_keyboard_led_state();
+    oled_write_P(led_state.num_lock ? PSTR("NUM ") : PSTR("    "), false);
+    oled_write_P(led_state.caps_lock ? PSTR("CAP ") : PSTR("    "), false);
+    oled_write_P(led_state.scroll_lock ? PSTR("SCR ") : PSTR("    "), false);
+
+}
+#endif
+
+
+
+/*
+#ifdef OLED_DRIVER_ENABLE
+void oled_task_user(void) {
+    // Host Keyboard Layer Status
+    oled_write_P(PSTR("Layer: "), false);
+
+    switch (get_highest_layer(layer_state)) {
+        case _Base:
+            oled_write_P(PSTR("Default\n"), false);
+            break;
+        case _Ll:
+            oled_write_P(PSTR("Layer 1\n"), false);
+            break;
+
+        default:
+            // Or use the write_ln shortcut over adding '\n' to the end of your string
+            oled_write_ln_P(PSTR("Undefined"), false);
     }
 
 
 }
 #endif
-
+*/
 
 
 void dip_switch_update_user(uint8_t index, bool active) 
